@@ -35,17 +35,19 @@ import { LucideIcon } from "@/components/widget/Icon";
 import { BottomIndicator, LeftIndicator } from "@/components/widget/Indicator";
 import { Logo } from "@/components/widget/Logo";
 import { MiniMyProfile } from "@/components/widget/MiniMyProfile";
-import { NavBreadcrumb, TopBar } from "@/components/widget/Page";
+import { NavBreadcrumb } from "@/components/widget/Page";
 import { Today } from "@/components/widget/Today";
 import { VerifyingScreen } from "@/components/widget/VerifyingScreen";
 import { APP } from "@/constants/_meta";
 import { OTHER_PRIVATE_NAVS, PRIVATE_NAVS } from "@/constants/navs";
 import { Props__Layout, Props__NavLink } from "@/constants/props";
+import { OPTIONS_APP_LAYOUT } from "@/constants/selectOptions";
 import {
   BASE_ICON_BOX_SIZE,
   FIREFOX_SCROLL_Y_CLASS_PR_PREFIX,
   MOBILE_NAVS_H,
 } from "@/constants/sizes";
+import useAppLayout from "@/context/useAppLayout";
 import useAuthMiddleware from "@/context/useAuthMiddleware";
 import useLang from "@/context/useLang";
 import useNavs from "@/context/useNavs";
@@ -67,9 +69,12 @@ import { Box, Center, HStack, Icon } from "@chakra-ui/react";
 import { IconCircleFilled } from "@tabler/icons-react";
 import {
   ChevronsUpDownIcon,
+  Maximize2Icon,
+  Minimize2Icon,
   SidebarCloseIcon,
   SidebarOpenIcon,
   UserIcon,
+  XIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -107,18 +112,124 @@ const MobileNavLink = (props: Props__NavLink) => {
   // Props
   const { children, ...restProps } = props;
 
+  // Contexts
+  const closedPanel = useAppLayout((s) => s.closedPanel);
+  const setLayout = useAppLayout((s) => s.setLayout);
+
   return (
     <NavLink
       minW={"50px"}
       align={"center"}
       gap={1}
       pos={"relative"}
+      onClick={() => {
+        if (closedPanel) {
+          setLayout(OPTIONS_APP_LAYOUT[0]); // half
+        }
+      }}
       {...restProps}
     >
       {children}
     </NavLink>
   );
 };
+const DesktopNavLink = (props: Props__NavLink) => {
+  // Props
+  const { children, ...restProps } = props;
+
+  // Contexts
+  const closedPanel = useAppLayout((s) => s.closedPanel);
+  const setLayout = useAppLayout((s) => s.setLayout);
+
+  return (
+    <NavLink
+      w={"full"}
+      onClick={() => {
+        if (closedPanel) {
+          setLayout(OPTIONS_APP_LAYOUT[0]); // half
+        }
+      }}
+      {...restProps}
+    >
+      {children}
+    </NavLink>
+  );
+};
+
+const TopBar = () => {
+  // Contexts
+  const halfPanel = useAppLayout((s) => s.halfPanel);
+  const setLayout = useAppLayout((s) => s.setLayout);
+
+  // Hooks
+  const pathname = usePathname();
+  const { sw } = useScreen();
+
+  // States
+  const activeNavs = getActiveNavs(pathname);
+  const resolvedActiveNavs =
+    sw < 360 ? [activeNavs[activeNavs.length - 1]] : activeNavs;
+  const backPath = last(activeNavs)?.backPath;
+
+  return (
+    <HStack
+      w={"full"}
+      h={"56px"}
+      justify={"space-between"}
+      py={2}
+      pl={4}
+      pr={2}
+      borderBottom={"1px solid"}
+      borderColor={"border.muted"}
+      gap={8}
+    >
+      <NavBreadcrumb
+        backPath={backPath}
+        resolvedActiveNavs={resolvedActiveNavs}
+        ml={backPath ? -2 : -1}
+      />
+
+      <HStack>
+        <ColorModeButton size={"xs"} rounded={"full"} />
+
+        <Btn
+          iconButton
+          clicky={false}
+          variant={"ghost"}
+          size={"xs"}
+          rounded={"full"}
+          onClick={() => {
+            if (halfPanel) {
+              setLayout(OPTIONS_APP_LAYOUT[1]);
+            } else {
+              setLayout(OPTIONS_APP_LAYOUT[0]);
+            }
+          }}
+        >
+          <Icon boxSize={4}>
+            <LucideIcon icon={halfPanel ? Maximize2Icon : Minimize2Icon} />
+          </Icon>
+        </Btn>
+
+        <Btn
+          iconButton
+          clicky={false}
+          variant={"ghost"}
+          size={"xs"}
+          rounded={"full"}
+          onClick={() => {
+            setLayout(OPTIONS_APP_LAYOUT[2]);
+          }}
+        >
+          <Icon boxSize={BASE_ICON_BOX_SIZE}>
+            <LucideIcon icon={XIcon} />
+          </Icon>
+        </Btn>
+      </HStack>
+    </HStack>
+  );
+};
+
 const DesktoMiniMyProfile = (props: any) => {
   // Props
   const { navsExpanded, ...restProps } = props;
@@ -481,6 +592,8 @@ const DesktopLayout = (props: any) => {
   const { themeConfig } = useThemeConfig();
   const navsExpanded = useNavs((s) => s.navsExpanded);
   const toggleNavsExpanded = useNavs((s) => s.toggleNavsExpanded);
+  const halfPanel = useAppLayout((s) => s.halfPanel);
+  const fullPanel = useAppLayout((s) => s.fullPanel);
 
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -497,9 +610,7 @@ const DesktopLayout = (props: any) => {
     !item.allowedRoles ||
     item.allowedRoles.length === 0 ||
     (roleId && item.allowedRoles.includes(roleId));
-
   const qNormalized = q?.toLowerCase().trim();
-
   const resolvedNavs = PRIVATE_NAVS.map((nav) => {
     const filteredList = nav.list
       .map((item) => {
@@ -692,7 +803,11 @@ const DesktopLayout = (props: any) => {
                       return (
                         <Fragment key={nav.path}>
                           {!hasSubMenus && (
-                            <NavLink key={nav.path} to={nav.path} w={"full"}>
+                            <DesktopNavLink
+                              key={nav.path}
+                              to={nav.path}
+                              w={"full"}
+                            >
                               <NavTooltip
                                 content={pluckString(l, nav.labelKey)}
                               >
@@ -735,7 +850,7 @@ const DesktopLayout = (props: any) => {
                                   )}
                                 </Btn>
                               </NavTooltip>
-                            </NavLink>
+                            </DesktopNavLink>
                           )}
 
                           {hasSubMenus && !navsExpanded && (
@@ -1038,7 +1153,7 @@ const DesktopLayout = (props: any) => {
           <CContainer gap={1} mt={"auto"}>
             {OTHER_PRIVATE_NAVS[0].list.map((nav) => {
               return (
-                <NavLink key={nav.path} to={nav.path} w={"full"}>
+                <DesktopNavLink key={nav.path} to={nav.path} w={"full"}>
                   <NavTooltip content={pluckString(l, nav.labelKey)}>
                     <Btn
                       clicky={false}
@@ -1063,7 +1178,7 @@ const DesktopLayout = (props: any) => {
                       )}
                     </Btn>
                   </NavTooltip>
-                </NavLink>
+                </DesktopNavLink>
               );
             })}
           </CContainer>
@@ -1095,17 +1210,21 @@ const DesktopLayout = (props: any) => {
           overflow={"auto"}
         >
           <HStack flex={1} gap={0} align={"stretch"} overflowY={"auto"}>
-            <CContainer maxW={"400px"} overflowY={"auto"}>
-              <TopBar bg={"body"} />
+            {(halfPanel || fullPanel) && (
+              <CContainer maxW={fullPanel ? "" : "400px"} overflowY={"auto"}>
+                <TopBar />
 
-              {children}
-            </CContainer>
+                {children}
+              </CContainer>
+            )}
 
-            <CContainer borderLeft={"1px solid"} borderColor={"border.muted"}>
-              <Basemap />
+            {!fullPanel && (
+              <CContainer borderLeft={"1px solid"} borderColor={"border.muted"}>
+                <Basemap />
 
-              {/* Basemap Overlays */}
-            </CContainer>
+                {/* Basemap Overlays */}
+              </CContainer>
+            )}
           </HStack>
         </CContainer>
       </CContainer>
@@ -1185,7 +1304,7 @@ export default function Layout(props: Props__Layout) {
     return <VerifyingScreen />;
   }
 
-  // If request hook reports loading
+  // If request hook loading
   if (loading) {
     return <VerifyingScreen />;
   }

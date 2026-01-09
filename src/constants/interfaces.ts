@@ -9,6 +9,12 @@ import {
 import { AxiosRequestConfig, AxiosResponse } from "axios";
 import { ReactNode } from "react";
 
+// Gens
+export interface Interface__Gens extends Interface__CUD {
+  id: number;
+  label: string;
+}
+
 // Auth
 export interface Interface__ActivityLog extends Interface__CUD {
   id: string;

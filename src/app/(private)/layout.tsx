@@ -1129,6 +1129,9 @@ export default function Layout(props: Props__Layout) {
   const setPermissions = useAuthMiddleware((s) => s.setPermissions);
   const setVerifiedAuthToken = useAuthMiddleware((s) => s.setVerifiedAuthToken);
 
+  // Refs
+  const verificationStartedRef = useRef(false);
+
   // Hooks
   const iss = useIsSmScreenWidth();
   const router = useRouter();
@@ -1138,9 +1141,6 @@ export default function Layout(props: Props__Layout) {
     showSuccessToast: false,
     showErrorToast: false,
   });
-
-  // Refs
-  const verificationStartedRef = useRef(false);
 
   // If guard disabled -> render directly
   if (!ENABLE_AUTH_GUARD) {

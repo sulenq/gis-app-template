@@ -28,7 +28,6 @@ import {
 import SearchInput from "@/components/ui/search-input";
 import { Tooltip, TooltipProps } from "@/components/ui/tooltip";
 import { Basemap } from "@/components/widget/Basemap";
-import Clock from "@/components/widget/Clock";
 import FeedbackNotFound from "@/components/widget/FeedbackNotFound";
 import HScroll from "@/components/widget/HScroll";
 import { LucideIcon } from "@/components/widget/Icon";
@@ -36,7 +35,6 @@ import { BottomIndicator, LeftIndicator } from "@/components/widget/Indicator";
 import { Logo } from "@/components/widget/Logo";
 import { MiniMyProfile } from "@/components/widget/MiniMyProfile";
 import { NavBreadcrumb } from "@/components/widget/Page";
-import { Today } from "@/components/widget/Today";
 import { VerifyingScreen } from "@/components/widget/VerifyingScreen";
 import { APP } from "@/constants/_meta";
 import { OTHER_PRIVATE_NAVS, PRIVATE_NAVS } from "@/constants/navs";
@@ -156,7 +154,7 @@ const DesktopNavLink = (props: Props__NavLink) => {
   );
 };
 
-const TopBar = () => {
+const ContentTopBar = () => {
   // Contexts
   const halfPanel = useAppLayout((s) => s.halfPanel);
   const setLayout = useAppLayout((s) => s.setLayout);
@@ -325,64 +323,47 @@ const MobileLayout = (props: any) => {
 
   // Contexts
   const { l } = useLang();
+  const fullPanel = useAppLayout((s) => s.fullPanel);
+  const closedPanel = useAppLayout((s) => s.closedPanel);
 
   // Hooks
   const pathname = usePathname();
-  const { sw } = useScreen();
 
   // States
   const user = getUserData();
-  const activeNavs = getActiveNavs(pathname);
-  const resolvedActiveNavs =
-    sw < 360 ? [activeNavs[activeNavs.length - 1]] : activeNavs;
-  const backPath = last(activeNavs)?.backPath;
   const isInProfileRoute = pathname.includes(`/profile`);
 
   return (
-    <CContainer h={"100dvh"} {...restProps}>
+    <CContainer h={"100dvh"} overflow={"clip"} justify={"end"} {...restProps}>
       {/* Content */}
-      <CContainer flex={1} h={`calc(100% - ${MOBILE_NAVS_H}`}>
-        {/* Content header */}
-        <HStack w={"full"} h={"40px"} justify={"space-between"} py={2} px={4}>
-          <HStack>
-            <Logo size={15} ml={"-4px"} />
-          </HStack>
-
-          <HStack>
-            <Clock fontSize={"sm"} showTimezone={sw > 320} />
-
-            <Today fontSize={"sm"} />
-
-            <ColorModeButton size={"xs"} rounded={"full"} mr={-2} />
-          </HStack>
-        </HStack>
-
+      <CContainer flex={1} h={`calc(100dvh - ${MOBILE_NAVS_H}`}>
         <CContainer
-          h={`calc(50dvh - ${MOBILE_NAVS_H}/2 - 20px)`}
+          h={
+            fullPanel
+              ? 0
+              : closedPanel
+              ? `calc(100dvh - ${MOBILE_NAVS_H})`
+              : `calc(50dvh - ${MOBILE_NAVS_H}/2)`
+          }
           overflow={"auto"}
+          transition={"200ms"}
         >
           <Basemap />
         </CContainer>
 
         <CContainer
-          h={`calc(50dvh - ${MOBILE_NAVS_H}/2 - 20px)`}
+          h={
+            closedPanel
+              ? 0
+              : fullPanel
+              ? `calc(100dvh - ${MOBILE_NAVS_H})`
+              : `calc(50dvh - ${MOBILE_NAVS_H}/2)`
+          }
           bg={MOBILE_BG_CONTENT_CONTAINER}
           overflowY={"auto"}
+          transition={"200ms"}
         >
-          <HStack
-            h={"40px"}
-            gap={4}
-            px={4}
-            borderBottom={"1px solid"}
-            borderColor={"border.muted"}
-            justify={"space-between"}
-          >
-            <NavBreadcrumb
-              backPath={backPath}
-              resolvedActiveNavs={resolvedActiveNavs}
-              ml={backPath ? -2 : -1}
-            />
-          </HStack>
+          <ContentTopBar />
 
           <CContainer flex={1} overflowY={"auto"}>
             {children}
@@ -595,8 +576,8 @@ const DesktopLayout = (props: any) => {
   const { themeConfig } = useThemeConfig();
   const navsExpanded = useNavs((s) => s.navsExpanded);
   const toggleNavsExpanded = useNavs((s) => s.toggleNavsExpanded);
-  const halfPanel = useAppLayout((s) => s.halfPanel);
   const fullPanel = useAppLayout((s) => s.fullPanel);
+  const closedPanel = useAppLayout((s) => s.closedPanel);
 
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -1213,21 +1194,28 @@ const DesktopLayout = (props: any) => {
           overflow={"auto"}
         >
           <HStack flex={1} gap={0} align={"stretch"} overflowY={"auto"}>
-            {(halfPanel || fullPanel) && (
-              <CContainer maxW={fullPanel ? "" : "400px"} overflowY={"auto"}>
-                <TopBar />
+            <CContainer
+              w={fullPanel ? "full" : closedPanel ? 0 : "400px"}
+              overflowY={"auto"}
+              transition={"200ms"}
+            >
+              <ContentTopBar />
 
+              <CContainer minW={"400px"} overflowY={"auto"}>
                 {children}
               </CContainer>
-            )}
+            </CContainer>
 
-            {!fullPanel && (
-              <CContainer borderLeft={"1px solid"} borderColor={"border.muted"}>
-                <Basemap />
+            <CContainer
+              w={fullPanel ? 0 : `calc(100% - ${closedPanel ? 0 : 400}px)`}
+              borderLeft={"1px solid"}
+              borderColor={"border.muted"}
+              transition={"200ms"}
+            >
+              <Basemap />
 
-                {/* Basemap Overlays */}
-              </CContainer>
-            )}
+              {/* Basemap Overlays */}
+            </CContainer>
           </HStack>
         </CContainer>
       </CContainer>

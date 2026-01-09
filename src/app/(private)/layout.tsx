@@ -81,7 +81,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 
 const USER_PROFILE_URL = "/api/get-user-profile";
 const DESKTOP_NAVS_BG = "body";
-const NAVS_COLOR = "fg.muted";
+const NAVS_COLOR = "ibody";
 const NAVS_COLOR_PALETTE = "gray";
 const DESKTOP_BG_CONTENT_CONTAINER = "bgContent";
 const MOBILE_BG_CONTENT_CONTAINER = "body";
@@ -407,7 +407,7 @@ const MobileLayout = (props: any) => {
                         <MobileNavLink
                           key={nav.path}
                           to={nav.subMenus ? "" : nav.path}
-                          color={isMainNavActive ? "" : "fg.muted"}
+                          color={isMainNavActive ? "" : NAVS_COLOR}
                           flex={1}
                         >
                           <Icon boxSize={5}>
@@ -442,7 +442,7 @@ const MobileLayout = (props: any) => {
                                 minW={"50px"}
                                 align={"center"}
                                 gap={1}
-                                color={isMainNavActive ? "" : "fg.muted"}
+                                color={isMainNavActive ? "" : NAVS_COLOR}
                                 pos={"relative"}
                                 cursor={"pointer"}
                                 flex={1}
@@ -519,7 +519,7 @@ const MobileLayout = (props: any) => {
               <MobileNavLink
                 key={nav.path}
                 to={nav.path}
-                color={pathname === nav.path ? "" : "fg.muted"}
+                color={pathname === nav.path ? "" : NAVS_COLOR}
                 flex={1}
               >
                 <Icon boxSize={5}>
@@ -742,7 +742,7 @@ const DesktopLayout = (props: any) => {
                 variant={"ghost"}
                 colorPalette={NAVS_COLOR_PALETTE}
                 onClick={toggleNavsExpanded}
-                color={"fg.muted"}
+                color={NAVS_COLOR}
               >
                 <Icon boxSize={BASE_ICON_BOX_SIZE}>
                   <LucideIcon

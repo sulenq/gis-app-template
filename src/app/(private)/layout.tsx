@@ -189,15 +189,18 @@ const TopBar = () => {
         ml={backPath ? -2 : -1}
       />
 
-      <HStack>
-        <ColorModeButton size={"xs"} rounded={"full"} />
+      <HStack gap={1}>
+        <ColorModeButton
+          size={"xs"}
+          // rounded={"full"}
+        />
 
         <Btn
           iconButton
           clicky={false}
           variant={"ghost"}
           size={"xs"}
-          rounded={"full"}
+          // rounded={"full"}
           onClick={() => {
             if (halfPanel) {
               setLayout(OPTIONS_APP_LAYOUT[1]);
@@ -216,7 +219,7 @@ const TopBar = () => {
           clicky={false}
           variant={"ghost"}
           size={"xs"}
-          rounded={"full"}
+          // rounded={"full"}
           onClick={() => {
             setLayout(OPTIONS_APP_LAYOUT[2]);
           }}

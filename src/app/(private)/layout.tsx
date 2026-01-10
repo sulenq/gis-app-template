@@ -78,15 +78,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState } from "react";
 
 const USER_PROFILE_URL = "/api/get-user-profile";
-const DESKTOP_NAVS_BG = "body";
+
 const NAVS_COLOR = "ibody";
 const NAVS_COLOR_PALETTE = "gray";
-const DESKTOP_BG_CONTENT_CONTAINER = "bgContent";
+
 const MOBILE_BG_CONTENT_CONTAINER = "body";
-const DESKTOP_POPOVER_MAIN_AXIS = 20;
-const DESKTOP_TOOLTIP_MAIN_AXIS = 24;
 const MOBILE_NAV_LABEL_FONT_SIZE = "sm";
 const MOBILE_POPOVER_MAIN_AXIS = 22;
+
+const DESKTOP_NAVS_BG = "body";
+const DESKTOP_BG_CONTENT_CONTAINER = "bgContent";
+const DESKTOP_POPOVER_MAIN_AXIS = 20;
+const DESKTOP_TOOLTIP_MAIN_AXIS = 24;
+const DESKTOP_LAYOUT_BORDER_COLOR = "border.muted";
 
 const NavTooltip = (props: TooltipProps) => {
   // Props
@@ -156,6 +160,7 @@ const DesktopNavLink = (props: Props__NavLink) => {
 
 const ContentTopBar = () => {
   // Contexts
+  const { l } = useLang();
   const halfPanel = useAppLayout((s) => s.halfPanel);
   const setLayout = useAppLayout((s) => s.setLayout);
 
@@ -178,7 +183,7 @@ const ContentTopBar = () => {
       pl={4}
       pr={2}
       borderBottom={"1px solid"}
-      borderColor={"border.muted"}
+      borderColor={DESKTOP_LAYOUT_BORDER_COLOR}
       gap={8}
     >
       <NavBreadcrumb
@@ -193,39 +198,43 @@ const ContentTopBar = () => {
           // rounded={"full"}
         />
 
-        <Btn
-          iconButton
-          clicky={false}
-          variant={"ghost"}
-          size={"xs"}
-          // rounded={"full"}
-          onClick={() => {
-            if (halfPanel) {
-              setLayout(OPTIONS_APP_LAYOUT[1]);
-            } else {
-              setLayout(OPTIONS_APP_LAYOUT[0]);
-            }
-          }}
-        >
-          <Icon boxSize={4}>
-            <LucideIcon icon={halfPanel ? Maximize2Icon : Minimize2Icon} />
-          </Icon>
-        </Btn>
+        <Tooltip content={halfPanel ? "Maximize" : "Minimize"}>
+          <Btn
+            iconButton
+            clicky={false}
+            variant={"ghost"}
+            size={"xs"}
+            // rounded={"full"}
+            onClick={() => {
+              if (halfPanel) {
+                setLayout(OPTIONS_APP_LAYOUT[1]);
+              } else {
+                setLayout(OPTIONS_APP_LAYOUT[0]);
+              }
+            }}
+          >
+            <Icon boxSize={4}>
+              <LucideIcon icon={halfPanel ? Maximize2Icon : Minimize2Icon} />
+            </Icon>
+          </Btn>
+        </Tooltip>
 
-        <Btn
-          iconButton
-          clicky={false}
-          variant={"ghost"}
-          size={"xs"}
-          // rounded={"full"}
-          onClick={() => {
-            setLayout(OPTIONS_APP_LAYOUT[2]);
-          }}
-        >
-          <Icon boxSize={BASE_ICON_BOX_SIZE}>
-            <LucideIcon icon={XIcon} />
-          </Icon>
-        </Btn>
+        <Tooltip content={l.close}>
+          <Btn
+            iconButton
+            clicky={false}
+            variant={"ghost"}
+            size={"xs"}
+            // rounded={"full"}
+            onClick={() => {
+              setLayout(OPTIONS_APP_LAYOUT[2]);
+            }}
+          >
+            <Icon boxSize={BASE_ICON_BOX_SIZE}>
+              <LucideIcon icon={XIcon} />
+            </Icon>
+          </Btn>
+        </Tooltip>
       </HStack>
     </HStack>
   );
@@ -1190,7 +1199,7 @@ const DesktopLayout = (props: any) => {
           bg={"body"}
           // rounded={themeConfig.radii.container}
           borderLeft={"1px solid"}
-          borderColor={"border.muted"}
+          borderColor={DESKTOP_LAYOUT_BORDER_COLOR}
           overflow={"auto"}
         >
           <HStack flex={1} gap={0} align={"stretch"} overflowY={"auto"}>
@@ -1208,8 +1217,8 @@ const DesktopLayout = (props: any) => {
 
             <CContainer
               w={fullPanel ? 0 : `calc(100% - ${closedPanel ? 0 : 400}px)`}
-              borderLeft={"1px solid"}
-              borderColor={"border.muted"}
+              borderLeft={fullPanel || closedPanel ? 0 : "1px solid"}
+              borderColor={DESKTOP_LAYOUT_BORDER_COLOR}
               transition={"200ms"}
             >
               <Basemap />

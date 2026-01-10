@@ -1201,7 +1201,7 @@ const DesktopLayout = (props: any) => {
             >
               <ContentTopBar />
 
-              <CContainer minW={"400px"} overflowY={"auto"}>
+              <CContainer flex={1} minW={"400px"} overflowY={"auto"}>
                 {children}
               </CContainer>
             </CContainer>

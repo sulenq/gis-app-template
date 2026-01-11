@@ -2,7 +2,7 @@ import { Interface__Gens } from "@/constants/interfaces";
 import { OPTIONS_APP_LAYOUT } from "@/constants/selectOptions";
 import { create } from "zustand";
 
-const STORAGE_KEY = "layout";
+const STORAGE_KEY = "appLayout";
 const DEFAULT = OPTIONS_APP_LAYOUT[0];
 
 interface Props {

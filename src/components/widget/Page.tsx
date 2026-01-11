@@ -11,6 +11,7 @@ import { DotIndicator } from "@/components/widget/Indicator";
 import { Today } from "@/components/widget/Today";
 import { Interface__NavListItem } from "@/constants/interfaces";
 import useLang from "@/context/useLang";
+import { useThemeConfig } from "@/context/useThemeConfig";
 import useScreen from "@/hooks/useScreen";
 import { last } from "@/utils/array";
 import { pluckString } from "@/utils/string";
@@ -49,10 +50,18 @@ export const NavBreadcrumb = (props: any) => {
 
   // Contexts
   const { l } = useLang();
+  const { themeConfig } = useThemeConfig();
 
   return (
     <HStack gap={1} ml={"-4px"} h={"36px"} {...restProps}>
-      {backPath && <BackButton iconButton clicky={false} backPath={backPath} />}
+      {backPath && (
+        <BackButton
+          iconButton
+          clicky={false}
+          backPath={backPath}
+          rounded={themeConfig.radii.component}
+        />
+      )}
 
       <HStack color={"fg.subtle"} gap={0}>
         <Icon boxSize={5} opacity={0.6} rotate={"-12deg"}>

@@ -180,8 +180,8 @@ const ContentTopBar = () => {
       h={"56px"}
       justify={"space-between"}
       py={2}
-      pl={4}
-      pr={2}
+      pl={5}
+      pr={3}
       borderBottom={"1px solid"}
       borderColor={DESKTOP_LAYOUT_BORDER_COLOR}
       gap={8}

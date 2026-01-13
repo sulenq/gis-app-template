@@ -11,7 +11,6 @@ import { DotIndicator } from "@/components/widget/Indicator";
 import { Today } from "@/components/widget/Today";
 import { Interface__NavListItem } from "@/constants/interfaces";
 import useLang from "@/context/useLang";
-import { useThemeConfig } from "@/context/useThemeConfig";
 import useScreen from "@/hooks/useScreen";
 import { last } from "@/utils/array";
 import { pluckString } from "@/utils/string";
@@ -50,18 +49,10 @@ export const NavBreadcrumb = (props: any) => {
 
   // Contexts
   const { l } = useLang();
-  const { themeConfig } = useThemeConfig();
 
   return (
     <HStack gap={1} ml={"-4px"} h={"36px"} {...restProps}>
-      {backPath && (
-        <BackButton
-          iconButton
-          clicky={false}
-          backPath={backPath}
-          rounded={themeConfig.radii.component}
-        />
-      )}
+      {backPath && <BackButton iconButton clicky={false} backPath={backPath} />}
 
       <HStack color={"fg.subtle"} gap={0}>
         <Icon boxSize={5} opacity={0.6} rotate={"-12deg"}>
@@ -103,7 +94,7 @@ export const NavBreadcrumb = (props: any) => {
   );
 };
 
-export const TopBar = (props: StackProps) => {
+export const TopBar = () => {
   // Hooks
   const { sw } = useScreen();
   const pathname = usePathname();
@@ -124,7 +115,6 @@ export const TopBar = (props: StackProps) => {
       bg={"body"}
       borderBottom={"1px solid"}
       borderColor={"border.muted"}
-      {...props}
     >
       <NavBreadcrumb
         backPath={backPath}
@@ -162,7 +152,7 @@ export const PageTitle = (props: StackProps) => {
 
   return (
     <HStack flexShrink={0} px={4} my={3} minH={"36px"} {...restProps}>
-      <ClampText fontSize={"xl"} fontWeight={"semibold"}>
+      <ClampText w={"fit"} fontSize={"xl"} fontWeight={"semibold"}>
         {title}
       </ClampText>
 
